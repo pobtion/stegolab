@@ -1,0 +1,9 @@
+{
+  "name": "stegolab",
+  "version": "1.0.0",
+  "private": true,
+  "description": "StegoLab — local image steganography lab",
+  "scripts": {
+    "start": "node server.js"
+  }
+}

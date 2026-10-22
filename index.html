@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#09141b" />
+  <meta name="description" content="StegoLab — phòng thí nghiệm giấu tin trong ảnh, chạy cục bộ trong trình duyệt." />
+  <title>StegoLab — Giấu tin trong ảnh</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" aria-label="StegoLab trang chủ">
+        <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><b></b></span>
+        <span class="brand-wordmark"><strong>STEGO</strong><em>/LAB</em></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="privacy-chip"><span class="status-dot"></span> xử lý cục bộ</span>
+        <button class="icon-button" id="themeToggle" type="button" aria-label="Chuyển giao diện sáng tối" title="Chuyển giao diện sáng tối">◐</button>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow"><span>01</span> LOCAL SIGNAL LAB <span class="eyebrow-rule"></span></p>
+          <h1>Giấu một <span>tín hiệu</span><br />trong ảnh.</h1>
+          <p class="hero-lede">Steganography trực tiếp trên trình duyệt. Tin nhắn nằm trong những bit cuối của pixel — mắt thường không thấy, nhưng bạn có thể kiểm chứng từng bit.</p>
+          <div class="hero-note"><span class="note-icon">⌁</span><span>Ảnh và mật khẩu không rời khỏi thiết bị của bạn.</span></div>
+        </div>
+        <div class="hero-instrument" aria-label="Thông số hệ thống">
+          <div class="instrument-top"><span>SYSTEM / READY</span><span class="mono">v1.0.0</span></div>
+          <div class="signal-grid">
+            <div class="signal-line line-one"></div><div class="signal-line line-two"></div><div class="signal-line line-three"></div>
+            <div class="signal-pulse"><span></span><span></span><span></span><span></span><span></span></div>
+          </div>
+          <div class="instrument-readout"><span>BIT DEPTH</span><strong>1 LSB</strong><span class="readout-good">STABLE</span></div>
+        </div>
+      </section>
+
+      <section class="quick-facts" aria-label="Thông tin nhanh">
+        <div class="fact"><span class="fact-label">MỤC TIÊU</span><strong>Ẩn sự tồn tại</strong><small>không chỉ che nội dung</small></div>
+        <div class="fact"><span class="fact-label">ĐẦU RA</span><strong>PNG không mất dữ liệu</strong><small>gửi dưới dạng file</small></div>
+        <div class="fact"><span class="fact-label">CƠ CHẾ</span><strong>Canvas + Web Crypto</strong><small>không backend, không API</small></div>
+        <div class="fact fact-accent"><span class="fact-label">GIỚI HẠN</span><strong>25 MP / ảnh</strong><small>giữ thao tác nhẹ và an toàn</small></div>
+      </section>
+
+      <nav class="tabbar" aria-label="Các chức năng StegoLab">
+        <button class="tab is-active" data-tab="embed" type="button"><span class="tab-index">01</span><span>Nhúng tin</span><small>encode</small></button>
+        <button class="tab" data-tab="decode" type="button"><span class="tab-index">02</span><span>Giải mã</span><small>decode</small></button>
+        <button class="tab" data-tab="raw" type="button"><span class="tab-index">03</span><span>Raw LSB</span><small>inspect</small></button>
+        <button class="tab" data-tab="analyze" type="button"><span class="tab-index">04</span><span>Phân tích</span><small>chi-square</small></button>
+        <button class="tab" data-tab="learn" type="button"><span class="tab-index">05</span><span>Cách hoạt động</span><small>field notes</small></button>
+      </nav>
+
+      <section class="workspace">
+        <div class="workspace-heading">
+          <div><p class="section-kicker" id="viewKicker">01 / ENCODE</p><h2 id="viewTitle">Nhúng tin vào ảnh</h2></div>
+          <p class="workspace-hint" id="viewHint">Chọn một ảnh làm vật mang, sau đó ghi một tín hiệu vào bit cuối của pixel.</p>
+        </div>
+
+        <section class="view is-visible" id="view-embed" data-view="embed">
+          <div class="tool-layout">
+            <div class="tool-main">
+              <article class="panel step-panel">
+                <div class="panel-heading"><div><span class="step-number">01</span><h3>Chọn ảnh vật mang</h3></div><span class="panel-tag">INPUT / IMAGE</span></div>
+                <div class="dropzone" id="embedDropzone" tabindex="0" role="button" aria-label="Chọn ảnh vật mang">
+                  <input id="embedFile" type="file" accept="image/*" hidden />
+                  <div class="dropzone-mark"><span></span><span></span><span></span><span></span></div>
+                  <strong>Thả ảnh vào đây</strong><span>hoặc bấm để duyệt file · PNG / JPG / WebP</span>
+                  <button class="text-button" type="button">Chọn file <b>→</b></button>
+                </div>
+                <div class="file-readout is-hidden" id="embedFileReadout"><span class="file-icon">▧</span><div><strong id="embedFileName">—</strong><small id="embedFileMeta">—</small></div><span class="file-state" id="embedFileState">READY</span></div>
+              </article>
+
+              <article class="panel step-panel">
+                <div class="panel-heading"><div><span class="step-number">02</span><h3>Viết tín hiệu</h3></div><span class="panel-tag">INPUT / UTF-8</span></div>
+                <label class="field-label" for="messageInput">Tin nhắn sẽ được ghi vào ảnh</label>
+                <textarea id="messageInput" rows="5" maxlength="200000" placeholder="Nhập tin nhắn tiếng Việt, emoji hoặc bất kỳ ký tự UTF-8 nào…"></textarea>
+                <div class="field-foot"><span id="messageCount">0 ký tự</span><span id="embedCapacity">Chưa có ảnh · dung lượng chưa xác định</span></div>
+              </article>
+
+              <article class="panel step-panel">
+                <div class="panel-heading"><div><span class="step-number">03</span><h3>Chọn chế độ</h3></div><span class="panel-tag">METHOD / LSB</span></div>
+                <div class="mode-grid">
+                  <label class="mode-card is-selected"><input type="radio" name="mode" value="standard" checked /><span class="mode-top"><b>Chuẩn</b><span class="mode-badge">CS</span></span><small>LSB tuần tự, định dạng công khai để đọc chéo với công cụ tương thích.</small><span class="mode-detail">header CS · MSB-first</span></label>
+                  <label class="mode-card"><input type="radio" name="mode" value="advanced" /><span class="mode-top"><b>Nâng cao</b><span class="mode-badge mode-badge-accent">STG1</span></span><small>Mã hóa AES-GCM và rải bit ngẫu nhiên. Chỉ StegoLab đọc được.</small><span class="mode-detail">PBKDF2 · AES-256-GCM · scatter</span></label>
+                </div>
+                <div class="advanced-fields is-hidden" id="advancedFields">
+                  <label class="field-label" for="embedPassword">Mật khẩu <span>(tùy chọn, nhưng nên dùng)</span></label>
+                  <div class="password-wrap"><input id="embedPassword" type="password" autocomplete="off" placeholder="Để trống nếu chỉ muốn rải bit" /><button type="button" class="reveal-button" data-target="embedPassword" aria-label="Hiện mật khẩu">hiện</button></div>
+                  <p class="field-help">Có mật khẩu: PBKDF2-SHA256 150.000 vòng + AES-256-GCM. Không có mật khẩu: rải bit nhưng không mã hóa.</p>
+                </div>
+                <button class="primary-button" id="embedSubmit" type="button"><span>Nhúng tín hiệu vào ảnh</span><b>→</b></button>
+                <div class="inline-status" id="embedStatus" role="status"></div>
+              </article>
+            </div>
+            <aside class="side-rail">
+              <div class="rail-note rail-note-lime"><span class="rail-symbol">◎</span><div><strong>Không để lại dấu vết mạng</strong><p>Canvas và Web Crypto chạy ngay trên máy bạn. Không upload, không server.</p></div></div>
+              <div class="rail-note"><span class="rail-symbol">!</span><div><strong>PNG là bắt buộc</strong><p>JPEG và các ứng dụng nhắn tin có thể nén lại ảnh, làm mất bit cuối. Nếu cần gửi, chọn “gửi dưới dạng file”.</p></div></div>
+              <div class="rail-equation"><span>CAPACITY</span><strong>(W × H × 3) ÷ 8</strong><small>mỗi kênh màu mang 1 bit</small></div>
+            </aside>
+          </div>
+
+          <article class="panel result-panel is-hidden" id="embedResults">
+            <div class="panel-heading"><div><span class="step-number step-done">✓</span><h3>Kết quả đo</h3></div><span class="panel-tag tag-success">EMBED COMPLETE</span></div>
+            <div class="metrics-grid">
+              <div class="metric"><span>PSNR</span><strong id="resultPsnr">—</strong><small>mục tiêu &gt; 40 dB</small></div>
+              <div class="metric"><span>MSE</span><strong id="resultMse">—</strong><small>sai số trung bình / kênh</small></div>
+              <div class="metric"><span>PIXELS CHANGED</span><strong id="resultChanged">—</strong><small>pixel có ít nhất 1 kênh đổi</small></div>
+              <div class="metric metric-accent"><span>PAYLOAD</span><strong id="resultPayload">—</strong><small id="resultMode">—</small></div>
+            </div>
+            <div class="download-strip"><div><strong>Ảnh đã sẵn sàng.</strong><span>Định dạng PNG không mất dữ liệu, có thể tải về và giải mã lại.</span></div><a class="secondary-button" id="downloadStego" href="#" download="stegolab-stego.png">Tải ảnh PNG <b>↓</b></a></div>
+            <div class="preview-grid">
+              <div class="preview-card"><div class="preview-label"><span>COVER / GỐC</span><i></i></div><canvas id="coverCanvas"></canvas></div>
+              <div class="preview-card preview-emphasis"><div class="preview-label"><span>STEGO / ĐÃ NHÚNG</span><i></i></div><canvas id="stegoCanvas"></canvas></div>
+              <div class="preview-card"><div class="preview-label"><span>DIFFERENCE × 12</span><i></i></div><canvas id="diffCanvas"></canvas></div>
+              <div class="preview-card"><div class="preview-label"><span>LSB PLANE / RGB</span><i></i></div><canvas id="lsbCanvas"></canvas></div>
+            </div>
+          </article>
+        </section>
+
+        <section class="view" id="view-decode" data-view="decode">
+          <div class="tool-layout">
+            <div class="tool-main">
+              <article class="panel step-panel">
+                <div class="panel-heading"><div><span class="step-number">01</span><h3>Nạp ảnh cần đọc</h3></div><span class="panel-tag">INPUT / STEGO IMAGE</span></div>
+                <div class="dropzone" id="decodeDropzone" tabindex="0" role="button" aria-label="Chọn ảnh để giải mã">
+                  <input id="decodeFile" type="file" accept="image/*" hidden />
+                  <div class="dropzone-mark decode-mark"><span></span><span></span><span></span><span></span></div>
+                  <strong>Thả ảnh PNG đã nhúng vào đây</strong><span>StegoLab sẽ tự nhận diện CS hoặc STG1 từ pixel thật</span>
+                  <button class="text-button" type="button">Chọn file <b>→</b></button>
+                </div>
+                <div class="file-readout is-hidden" id="decodeFileReadout"><span class="file-icon">▧</span><div><strong id="decodeFileName">—</strong><small id="decodeFileMeta">—</small></div><span class="file-state" id="decodeFileState">READY</span></div>
+              </article>
+              <article class="panel step-panel">
+                <div class="panel-heading"><div><span class="step-number">02</span><h3>Mở khóa nếu cần</h3></div><span class="panel-tag">AUTO-DETECT</span></div>
+                <label class="field-label" for="decodePassword">Mật khẩu chế độ Nâng cao <span>(nếu ảnh có mã hóa)</span></label>
+                <div class="password-wrap"><input id="decodePassword" type="password" autocomplete="off" placeholder="Không cần nếu ảnh ở chế độ Chuẩn hoặc không mã hóa" /><button type="button" class="reveal-button" data-target="decodePassword" aria-label="Hiện mật khẩu">hiện</button></div>
+                <p class="field-help">Không cần chọn chế độ trước. Header được đọc trực tiếp từ 6/9 byte đầu của ảnh.</p>
+                <button class="primary-button" id="decodeSubmit" type="button"><span>Đọc tin nhắn từ pixel</span><b>→</b></button>
+                <div class="inline-status" id="decodeStatus" role="status"></div>
+              </article>
+            </div>
+            <aside class="side-rail">
+              <div class="rail-note rail-note-lime"><span class="rail-symbol">⌁</span><div><strong>Đọc từ pixel thật</strong><p>Không có lịch sử nhúng nào được lưu. Header, độ dài và payload đều được lấy lại từ ảnh bạn chọn.</p></div></div>
+              <div class="rail-note"><span class="rail-symbol">CS</span><div><strong>Chuẩn đọc chéo</strong><p>Chế độ Chuẩn dùng header CS và có thể kiểm chứng với công cụ tương thích bên ngoài.</p></div></div>
+            </aside>
+          </div>
+          <article class="panel decode-result is-hidden" id="decodeResult"><div class="panel-heading"><div><span class="step-number step-done">✓</span><h3>Tin nhắn đã đọc</h3></div><span class="panel-tag tag-success" id="decodeModeTag">—</span></div><div class="decoded-message" id="decodedMessage"></div><div class="decoded-foot"><span id="decodeMeta">—</span><button class="ghost-button" id="copyDecoded" type="button">Sao chép tin nhắn <b>↗</b></button></div></article>
+        </section>
+
+        <section class="view" id="view-raw" data-view="raw">
+          <div class="tool-layout">
+            <div class="tool-main">
+              <article class="panel step-panel">
+                <div class="panel-heading"><div><span class="step-number">01</span><h3>Quan sát bit cuối</h3></div><span class="panel-tag">READ / RAW BITS</span></div>
+                <div class="dropzone compact-drop" id="rawDropzone" tabindex="0" role="button" aria-label="Chọn ảnh để đọc Raw LSB">
+                  <input id="rawFile" type="file" accept="image/*" hidden />
+                  <div class="dropzone-mark raw-mark"><span></span><span></span><span></span><span></span></div><strong>Chọn ảnh để soi Raw LSB</strong><span>Đọc tuần tự các bit R, G, B — bỏ qua alpha</span><button class="text-button" type="button">Chọn file <b>→</b></button>
+                </div>
+                <div class="file-readout is-hidden" id="rawFileReadout"><span class="file-icon">▧</span><div><strong id="rawFileName">—</strong><small id="rawFileMeta">—</small></div><span class="file-state" id="rawFileState">READY</span></div>
+                <button class="primary-button" id="rawSubmit" type="button"><span>Quét bit cuối</span><b>→</b></button><div class="inline-status" id="rawStatus" role="status"></div>
+              </article>
+              <article class="panel raw-result is-hidden" id="rawResult"><div class="panel-heading"><div><span class="step-number step-done">✓</span><h3>Dữ liệu thô từ pixel</h3></div><span class="panel-tag">NO MEMORY / DIRECT READ</span></div><div class="raw-meta" id="rawMeta">—</div><div class="raw-columns"><div><div class="code-label">HEX / 4 KB PREVIEW</div><pre class="code-block" id="rawHex">—</pre></div><div><div class="code-label">UTF-8 / PRINTABLE VIEW</div><pre class="code-block printable" id="rawChars">—</pre></div></div><div class="raw-plane-wrap"><div class="code-label">LSB PLANE / RED + GREEN + BLUE</div><canvas id="rawPlaneCanvas"></canvas></div></article>
+            </div>
+            <aside class="side-rail"><div class="rail-note rail-note-lime"><span class="rail-symbol">⌘</span><div><strong>Bằng chứng khách quan</strong><p>Tab này không “nhớ” tin nhắn. Nó chỉ hiển thị những gì đang thực sự nằm ở bit cuối của pixel.</p></div></div><div class="rail-note"><span class="rail-symbol">STG1</span><div><strong>Nâng cao sẽ nhìn như nhiễu</strong><p>Đó là chủ ý: payload được rải theo seed của mật khẩu và có thể đã được mã hóa.</p></div></div></aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-analyze" data-view="analyze">
+          <div class="analysis-intro"><div><span class="analysis-orb">χ²</span></div><div><p class="section-kicker">STATISTICAL TEST / PAIR COUNTS</p><h3>Ảnh có đang “nói” quá nhiều không?</h3><p>Kiểm định chi-square xem hai giá trị trong mỗi cặp <code>(2k, 2k+1)</code> có xu hướng bằng nhau hay không. p-value cao có thể đáng ngờ khi ảnh bị nhúng nhiều — nhưng đây không phải bằng chứng tuyệt đối.</p></div></div>
+          <div class="analysis-grid">
+            <article class="panel analysis-card"><div class="panel-heading"><div><span class="step-number">A</span><h3>Ảnh cần kiểm tra</h3></div><span class="panel-tag">SINGLE / IMAGE</span></div><div class="dropzone compact-drop" id="analysisDropzoneA" tabindex="0" role="button" aria-label="Chọn ảnh phân tích"><input id="analysisFileA" type="file" accept="image/*" hidden /><div class="dropzone-mark"><span></span><span></span><span></span><span></span></div><strong>Chọn ảnh để phân tích</strong><span>cover, stego hoặc ảnh bất kỳ</span><button class="text-button" type="button">Chọn file <b>→</b></button></div><div class="file-readout is-hidden" id="analysisReadoutA"><span class="file-icon">▧</span><div><strong id="analysisFileNameA">—</strong><small id="analysisFileMetaA">—</small></div><span class="file-state">READY</span></div></article>
+            <article class="panel analysis-card"><div class="panel-heading"><div><span class="step-number">B</span><h3>Ảnh đối chiếu <span>(tùy chọn)</span></h3></div><span class="panel-tag">COMPARE / COVER</span></div><div class="dropzone compact-drop" id="analysisDropzoneB" tabindex="0" role="button" aria-label="Chọn ảnh đối chiếu"><input id="analysisFileB" type="file" accept="image/*" hidden /><div class="dropzone-mark"><span></span><span></span><span></span><span></span></div><strong>Thêm ảnh cover để so sánh</strong><span>hai p-value đặt cạnh nhau</span><button class="text-button" type="button">Chọn file <b>→</b></button></div><div class="file-readout is-hidden" id="analysisReadoutB"><span class="file-icon">▧</span><div><strong id="analysisFileNameB">—</strong><small id="analysisFileMetaB">—</small></div><span class="file-state">OPTIONAL</span></div></article>
+          </div>
+          <button class="primary-button analysis-submit" id="analysisSubmit" type="button"><span>Chạy kiểm định chi-square</span><b>→</b></button><div class="inline-status" id="analysisStatus" role="status"></div>
+          <article class="panel analysis-result is-hidden" id="analysisResult"><div class="panel-heading"><div><span class="step-number step-done">✓</span><h3>Đọc kết quả thống kê</h3></div><span class="panel-tag">CHI-SQUARE / RGB</span></div><div class="analysis-metrics"><div class="metric"><span>P-VALUE / ẢNH A</span><strong id="analysisPValueA">—</strong><small id="analysisVerdictA">—</small></div><div class="metric"><span>P-VALUE / ẢNH B</span><strong id="analysisPValueB">—</strong><small id="analysisVerdictB">—</small></div><div class="metric"><span>STATISTIC</span><strong id="analysisStatistic">—</strong><small id="analysisDf">—</small></div></div><div class="chart-wrap"><div class="code-label">PARITY PAIR BALANCE / FIRST 64 PAIRS</div><canvas id="analysisChart" width="900" height="220"></canvas></div><p class="analysis-footnote" id="analysisFootnote">—</p></article>
+        </section>
+
+        <section class="view" id="view-learn" data-view="learn">
+          <div class="learn-hero"><span class="section-kicker">FIELD NOTES / 05</span><h3>Ẩn một tin nhắn không giống với<br /><span>đóng dấu bản quyền.</span></h3><p>StegoLab che sự tồn tại của một tín hiệu bằng cách thay đổi tối đa 1 đơn vị ở bit cuối. Đổi lại, cách này mong manh trước nén và chỉnh sửa.</p></div>
+          <div class="learn-grid">
+            <article class="learn-card large"><span class="learn-index">01 / LSB</span><h4>Bit cuối là một khe nhỏ</h4><p>Mỗi pixel có ba kênh màu R, G, B, mỗi kênh từ 0 đến 255. StegoLab thay bit cuối của từng kênh. Ví dụ <code>150 = 10010110</code>, ghi bit <code>1</code> thành <code>151 = 10010111</code>.</p><div class="bit-demo"><span>150</span><i>→</i><b>151</b><small>thay đổi tối đa 1 đơn vị</small></div></article>
+            <article class="learn-card"><span class="learn-index">02 / CAPACITY</span><h4>Dung lượng</h4><p><code>(rộng × cao × 3) ÷ 8</code> byte. Ảnh 1000×1000 có thể mang khoảng 375 KB trước khi trừ header.</p><div class="learn-stat">3 <small>bits / pixel</small></div></article>
+            <article class="learn-card"><span class="learn-index">03 / CRYPTO</span><h4>Nâng cao</h4><p>PBKDF2-SHA256 150.000 vòng biến mật khẩu thành khóa. AES-256-GCM bảo vệ nội dung bằng salt, IV và tag xác thực; sau đó các bit được rải theo seed.</p><div class="crypto-chain"><span>PASSWORD</span><i>→</i><span>KEY</span><i>→</i><span>PAYLOAD</span></div></article>
+            <article class="learn-card warning-card"><span class="learn-index">04 / LIMITS</span><h4>Điều gì làm tin biến mất?</h4><p>JPEG, resize, crop và việc gửi qua Messenger/Zalo/Facebook có thể xóa bit cuối. Hãy xuất PNG và gửi ảnh <strong>dưới dạng file</strong>. Nếu cần bền vững, đây không phải công cụ phù hợp.</p><div class="warning-line"><span>PNG FILE</span><b>✓</b><span>ẢNH BỊ NÉN</span><b>×</b></div></article>
+            <article class="learn-card large"><span class="learn-index">05 / STEGANALYSIS</span><h4>Chi-square không phải máy dò nói dối</h4><p>Kiểm định ghép các giá trị <code>(0,1), (2,3), …</code> và xem chúng có cân bằng bất thường không. Nhúng nhiều làm p-value cao hơn, vì các cặp có xu hướng bằng nhau. Kết quả cần được đọc cùng ngữ cảnh và ảnh đối chiếu.</p><div class="pvalue-scale"><span>khó kết luận</span><div><i></i><i></i><i></i><i></i><i></i></div><span>đáng chú ý</span></div></article>
+            <article class="learn-card future-card"><span class="learn-index">06 / NEXT</span><h4>Hướng phát triển</h4><p>Fragile watermark để biết ảnh có còn nguyên; DCT miền tần số để thử sống sót qua JPEG; C2PA và timestamp để xây dựng bằng chứng nguồn gốc. Watermark bản quyền cần nhiều lớp hơn LSB.</p><a href="#" class="learn-link" data-tab-link="embed">Quay lại phòng thí nghiệm <b>→</b></a></article>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <footer class="footer"><span>STEGO/LAB · VIBE CODING PROJECT</span><span>Canvas · Web Crypto · 100% local</span><span>Không phải công cụ watermark bản quyền</span></footer>
+  </div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
